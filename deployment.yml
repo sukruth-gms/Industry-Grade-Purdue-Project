@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rtdeployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rtapp
+  template:
+    metadata:
+      labels:
+        app: rtapp
+    spec:
+      nodeName: minikube  # Move nodeName here
+      containers:
+      - name: rtcontainer
+        image: rt-app-image:28
+        ports:
+        - containerPort: 8080
