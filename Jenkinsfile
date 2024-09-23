@@ -32,6 +32,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: '57785a38-2776-4ad8-8e80-1834ab7c7d85', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
                         sh 'sudo docker build -t rtapp:latest .'
+                        sh 'sudo docker push rtapp:latest'
                     }
                 }
             }
