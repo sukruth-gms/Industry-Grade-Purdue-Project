@@ -12,21 +12,18 @@ pipeline {
     stages {
         stage('Compile') {
             steps {
-                // Build the application
                 sh 'mvn clean compile'
             }
         }
 
         stage('Test') {
             steps {
-                // Run tests
                 sh 'mvn test'
             }
         }
 
         stage('Build') {
             steps {
-                // Package the application
                 sh 'mvn package'
             }
         }
@@ -37,6 +34,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'dockerhub-pass', usernameVariable: 'DOCKER_USER', passwordVariable: 'PASS')]) {
                         // Build the Docker image
                         def buildNumber = env.BUILD_NUMBER
+                        echo "Build number: ${buildNumber}" // Debug output
                         sh '''
                             echo "*** Building Docker image ***"
                             docker build -t $IMAGE:$buildNumber .
