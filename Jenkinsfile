@@ -32,13 +32,16 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'dockerhub-pass', usernameVariable: 'DOCKER_USER', passwordVariable: 'PASS')]) {
                         // Build the Docker image
+                        def buildNumber = env.BUILD_NUMBER
                         sh '''
+                            echo "*** Building Docker image ***"
+                            docker build -t $IMAGE:$buildNumber .
                             echo "Logging in to Docker Hub..."
                             echo $PASS | docker login -u $DOCKER_USER --password-stdin
                             echo "*** Tagging image ***"
-                            docker tag $IMAGE:$BUILD_NUMBER $DOCKER_USER/$IMAGE:$BUILD_NUMBER
+                            docker tag $IMAGE:$buildNumber $DOCKER_USER/$IMAGE:$buildNumber
                             echo "*** Pushing image ***"
-                            docker push $DOCKER_USER/$IMAGE:$BUILD_NUMBER
+                            docker push $DOCKER_USER/$IMAGE:$buildNumber
                         '''
                     }
                 }
