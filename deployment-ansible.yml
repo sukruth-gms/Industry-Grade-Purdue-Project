@@ -1,0 +1,7 @@
+- hosts: localhost
+  tasks:
+    - name: Pull Docker image
+      docker_image:
+        name: "{{ docker_user }}/{{ image_name }}"
+        tag: "{{ build_number }}"
+        state: present
