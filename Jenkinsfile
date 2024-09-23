@@ -5,6 +5,10 @@ pipeline {
         maven 'maven'  // The name of the Maven installation in Jenkins
     }
 
+    environment {
+        IMAGE = 'rt-app-image'  // Replace with your actual image name
+    }
+
     stages {
         stage('Compile') {
             steps {
