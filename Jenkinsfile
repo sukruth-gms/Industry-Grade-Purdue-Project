@@ -25,7 +25,7 @@ pipeline {
                 sh 'mvn package'
         }
      }
-       stage('Deploy the application'){
+       stage('Build the application image'){
             steps {
                 //Deploy
                 script {
@@ -34,6 +34,11 @@ pipeline {
                         sh 'docker build -t rtapp:latest .'
                     }
                 }
+            }
+       }
+        stage('Deploy with Ansible') {
+            steps {
+                sh 'ansible-playbook -i inventory deploy-ansibl.yml'
             }
         }
 }
