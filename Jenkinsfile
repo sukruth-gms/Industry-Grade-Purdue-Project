@@ -38,6 +38,8 @@ pipeline {
        }
         stage('Deploy with Ansible') {
             steps {
+                sh 'pwd'
+                sh 'ls -l'
                 sh 'ansible-playbook -i inventory.ini deploy-ansibl.yml'
             }
         }
