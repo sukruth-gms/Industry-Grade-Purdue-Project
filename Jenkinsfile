@@ -7,8 +7,6 @@ pipeline {
 
     environment {
         IMAGE = 'rt-app-image'  // Replace with your actual image name
-        DOCKER_USER = 'sukruth17'
-        PASS = credentials('dockerhub-pass')
     }
 
     stages {
@@ -29,6 +27,7 @@ pipeline {
                 sh 'mvn package'
             }
         }
+
         stage('Build Image') {
             steps {
                 script {
@@ -39,19 +38,18 @@ pipeline {
             }
         }
 
-        stage('Build the application image') {
+        stage('Push Image to Docker Hub') {
             steps {
                 script {
+                    // Get Docker Hub credentials
                     withCredentials([usernamePassword(credentialsId: 'dockerhub-pass', usernameVariable: 'DOCKER_USER', passwordVariable: 'PASS')]) {
-                        // Build the Docker image
-                        sh '''
-                            echo "Logging in to Docker Hub..."
-                            echo $PASS | docker login -u $DOCKER_USER --password-stdin
-                            echo "*** Tagging image ***"
-                            docker tag $IMAGE:$buildNumber $DOCKER_USER/$IMAGE:$buildNumber
-                            echo "*** Pushing image ***"
-                            docker push $DOCKER_USER/$IMAGE:$buildNumber
-                        '''
+                        def buildNumber = env.BUILD_NUMBER  // Ensure buildNumber is defined here
+                        echo "Logging in to Docker Hub..."
+                        sh "echo $PASS | docker login -u $DOCKER_USER --password-stdin"
+                        echo "*** Tagging image ***"
+                        sh "docker tag $IMAGE:$buildNumber $DOCKER_USER/$IMAGE:$buildNumber"
+                        echo "*** Pushing image ***"
+                        sh "docker push $DOCKER_USER/$IMAGE:$buildNumber"
                     }
                 }
             }
