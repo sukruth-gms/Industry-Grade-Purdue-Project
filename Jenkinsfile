@@ -38,7 +38,7 @@ pipeline {
        }
         stage('Deploy with Ansible') {
             steps {
-                sh 'ansible-playbook -i inventory.ini deploy-ansible.yml'
+                sh 'ansible-playbook -i inventory.ini deploy-ansibl.yml'
             }
         }
 }
