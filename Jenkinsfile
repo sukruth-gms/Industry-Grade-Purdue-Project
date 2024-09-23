@@ -1,10 +1,10 @@
 pipeline {
     agent any
-    
+
     tools {
         maven 'maven'  // The name of the Maven installation in Jenkins
     }
-    
+
     stages {
         stage('Compile') {
             steps {
@@ -19,24 +19,32 @@ pipeline {
                 sh 'mvn test'
             }
         }
-       stage('Build') {
+
+        stage('Build') {
             steps {
-                // Build
+                // Package the application
                 sh 'mvn package'
+            }
         }
-     }
-       stage('Build the application image'){
+
+        stage('Build the application image') {
             steps {
-                //Deploy
                 script {
-                    withCredentials([usernamePassword(credentialsId: '57785a38-2776-4ad8-8e80-1834ab7c7d85', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin docker.io'
-                        sh 'sudo docker build -t $DOCKER_USERNAME/rtapp:latest .'
-                        sh 'sudo docker push $DOCKER_USERNAME/rtapp:latest'
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-pass', usernameVariable: 'DOCKER_USER', passwordVariable: 'PASS')]) {
+                        // Build the Docker image
+                        sh '''
+                            echo "Logging in to Docker Hub..."
+                            echo $PASS | docker login -u $DOCKER_USER --password-stdin
+                            echo "*** Tagging image ***"
+                            docker tag $IMAGE:$BUILD_NUMBER $DOCKER_USER/$IMAGE:$BUILD_NUMBER
+                            echo "*** Pushing image ***"
+                            docker push $DOCKER_USER/$IMAGE:$BUILD_NUMBER
+                        '''
                     }
                 }
             }
-       }
+        }
+
         stage('Deploy with Ansible') {
             steps {
                 sh 'pwd'
@@ -44,5 +52,5 @@ pipeline {
                 sh 'ansible-playbook -i inventory.ini deploy-ansibl.yml'
             }
         }
-}
+    }
 }
